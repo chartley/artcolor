@@ -210,7 +210,6 @@
 
       const d360 = 2.0 * Math.PI;
       const d45 = d360 / 8.0;
-      // colors.reverse();
       for (var i=0; i<colors.length; i+=2) {
         if (i+1 >= colors.length) {
           break;  // prevent overflow in case of odd # colors
@@ -223,7 +222,6 @@
         // paint quadrants of the loop
         const r = (2+i)* w;
         for (var j=0; j<4; j++) {
-          // drawArc(ox, oy, r, w, sa, ea, color)
           var cIn = (j%2 == 0) ? c0 : c1;
           var cOut = (j%2 == 0) ? c1 : c0;
           drawArc(ox, oy, r, w, (2*j+1)*d45, (2*j+3)*d45, cIn, cOut);
@@ -236,9 +234,49 @@
       drawCircle(ox, oy, 1*w, innerRedColor);
     }
 
+    function animateRing(index) {
+      // repaint as white
+      var white = '#ffffff';
+      repaintRingColor(index, white);
+
+      // repaint as color
+      var color = colors[index] + 'cc';
+      repaintRingColor(index, color);
+    }
+
+    function repaintRingColor(i, color) {
+      var canvas = getCanvas();
+      var ox = canvas.width / 2;
+      var oy = canvas.height / 2;
+      var w = 5;   // pixels wide per arc
+
+      const d360 = 2.0 * Math.PI;
+      const d45 = d360 / 8.0;
+      if (i<0 || i>colors.length) {
+        console.log('repaintRingColor() with out-of-bounds ' + index);
+        return;
+      }
+
+      const r = (2+i)* w;
+      for (var j=0; j<4; j++) {
+        drawArc(ox, oy, r, w, (2*j+1)*d45, (2*j+3)*d45, color);
+      }
+    }
+
+    var animateCounter = 0;
+    function animateArtLoop() {
+      animateRing(animateCounter);
+      animateCounter += 1;
+    }
+
+    function animateArt() {
+      setInterval(animateArtLoop, 500);
+    }
+
     // when the page is loaded, init
     document.addEventListener('DOMContentLoaded', (event) => {
       drawArt();
+      // animateArt();
     })
   </script>
 </head>
