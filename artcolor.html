@@ -1,0 +1,247 @@
+<html>
+<head>
+  <title>Color</title>
+  <style>
+    art-area {
+      margin-bottom: 50px;
+    }
+    .test-area {
+      width: 20px;
+      height: 20px;
+      padding: 5px;
+    }
+  </style>
+  <script>
+    const colors = [
+      // '#8c2d41',
+      '#d6b788',
+      '#a94312',
+      '#cb7b3c',
+      '#a8533f',
+      '#c29089',
+      '#9d876f',
+      '#b7a78e',
+      '#bd6f6d',
+      '#d1a092',
+      '#294668',
+      '#180e17',
+      '#3a223c',
+      '#160404',
+      '#d09585',
+      '#222744',
+      '#2d4d76',
+      '#20336b',
+      '#190f0e',
+      '#d8c1a1',
+      '#67a590',
+      '#231e32',
+      '#323858',
+      '#525b7a',
+      '#405e78',
+      '#252a48',
+      '#2d1e1b',
+      '#ba606c',
+      '#e2bcb1',
+      '#ca4f61',
+      '#ebb8a7',
+      '#4d375d',
+      '#824c5c',
+      '#5a2d34',
+      '#352319',
+      '#708363',
+      '#ded1b1',
+      '#66999a',
+      '#342b2e',
+      '#486f9a',
+      '#414f72',
+      '#38281b',
+      '#464158',
+      '#ebd6c5',
+      '#c2c8bc',
+      '#f0ccb4',
+      '#c6c6bc',
+      '#647668',
+      '#e6d6b4',
+      '#6a7a8a',
+      '#d9c7a3',
+      '#e7c69d',
+      '#e37d6e',
+      '#f4a563',
+      '#f1bf8a',
+      '#e5dec4',
+      '#adc8cf',
+      '#6c9279',
+      '#dab99a',
+      '#e6db7f',
+      '#e23e40',
+      '#ddd87a',
+      '#d5b994',
+      '#618c79',
+      '#aac7cf',
+      '#e8dbc8',
+      '#f6bf89',
+      '#e4733b',
+      '#eca861',
+      '#e27771',
+      '#f3c8a6',
+      '#d7caa8',
+      '#556f8a',
+      '#e8e5bc',
+      '#49746b',
+      '#cccecb',
+      '#efd4c3',
+      '#c2d3cd',
+      '#353e5d',
+      '#211b25',
+      '#324e7d',
+      '#3570ac',
+      '#23233b',
+      '#55a4ab',
+      '#dfd8c6',
+      '#61896e',
+      '#170d15',
+      '#501a3e',
+      '#2c2a5c',
+      '#f3c9bb',
+      '#cc4f71',
+      '#e1c4c0',
+      '#ac586f',
+      '#1c1624',
+      '#0f2860',
+      '#3a6e95',
+      '#54689a',
+      '#1c3c6d',
+      '#132845',
+      '#65b7ab',
+      '#e6d3b3',
+      '#242e52',
+      '#1b4788',
+      '#3165a1',
+      '#1f325c',
+      '#e2a89d',
+      '#0a0813',
+      '#362b56',
+      '#11172f',
+      '#315f9a',
+      '#deb6b6',
+      '#ca7e8a',
+      '#c9c0b1',
+      '#a69988',
+      '#c7a3a7',
+      '#b8665b',
+      '#d68b4a',
+      '#c36333',
+      '#e7cfad',
+      '#c7747c',
+      '#9c3b5e',
+      '#cc8267',
+      '#9d9a91',
+      '#ddc0c2',
+      '#913854',
+      '#225977',
+      '#051129',
+      '#3b836f',
+      '#067376',
+      '#78b47e',
+      '#091018',
+      '#b5cb8d',
+      '#34888a',
+      '#01365e',
+      '#020a0d',
+      '#245073',
+      '#31527b',
+      '#00040f',
+      '#081b3b',
+      '#063458',
+      '#2d1925',
+      '#b68e75',
+      '#2b617d',
+      '#154d6e',
+      '#3e87a8',
+      '#061220',
+      '#358a8f',
+      '#35857c',
+      '#334f74',
+      '#03000b',
+      '#041f62',
+      '#659db4',
+      '#2d4261',
+    ];
+
+    function getCanvas() {
+      return document.getElementById('art-area');
+    }
+
+    function getCanvasContext() {
+      return getCanvas().getContext('2d');
+    }
+
+    function drawArc(ox, oy, r, w, sa, ea, color) {
+      var context = getCanvasContext();
+      context.beginPath();
+      var arc = context.arc(ox, oy, r, sa, ea);
+      context.lineWidth = w;
+      context.strokeStyle = color;
+      context.stroke();
+
+      return arc;
+    }
+
+    function drawCircle(ox, oy, r, color) {
+      var context = getCanvasContext();
+      context.beginPath();
+      context.arc(ox, oy, r, 0, Math.PI * 2);
+
+      context.fillStyle = color;
+      context.fill();
+    }
+
+    function clearCanvas() {
+      var canvas = document.getElementById('art-area');
+      const context = canvas.getContext('2d');
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawArt() {
+      var canvas = getCanvas();
+      var ox = canvas.width / 2;
+      var oy = canvas.height / 2;
+      var w = 5;   // pixels wide per arc
+
+      const d360 = 2.0 * Math.PI;
+      const d45 = d360 / 8.0;
+      // colors.reverse();
+      for (var i=0; i<colors.length; i+=2) {
+        if (i+1 >= colors.length) {
+          break;  // prevent overflow in case of odd # colors
+        }
+
+        // get two colors
+        var c0 = colors[i];
+        var c1 = colors[i+1];
+
+        // paint quadrants of the loop
+        const r = (2+i)* w;
+        for (var j=0; j<4; j++) {
+          // drawArc(ox, oy, r, w, sa, ea, color)
+          var cIn = (j%2 == 0) ? c0 : c1;
+          var cOut = (j%2 == 0) ? c1 : c0;
+          drawArc(ox, oy, r, w, (2*j+1)*d45, (2*j+3)*d45, cIn, cOut);
+          drawArc(ox, oy, r+w, w, (2*j+1)*d45, (2*j+3)*d45, cOut, cIn);
+        }
+      }
+
+      // finish with innermost red circle
+      var innerRedColor = '#bf1b1b';
+      drawCircle(ox, oy, 1*w, innerRedColor);
+    }
+
+    // when the page is loaded, init
+    document.addEventListener('DOMContentLoaded', (event) => {
+      drawArt();
+    })
+  </script>
+</head>
+<body>
+  <canvas id="art-area" width='700' height='700'></canvas></body>
+</html>
