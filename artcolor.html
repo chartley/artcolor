@@ -11,162 +11,40 @@
       padding: 5px;
     }
   </style>
+
+  <!-- shims -->
+  <script src="js/inc/shim/Base64.js" type="text/javascript"></script>
+  <script src="js/inc/shim/Base64binary.js" type="text/javascript"></script>
+  <script src="js/inc/shim/WebAudioAPI.js" type="text/javascript"></script>
+  <script src="js/inc/shim/WebMIDIAPI.js" type="text/javascript"></script>
+
+  <!-- midijs -->
+  <script src="js/midijs/audioDetect.js" type="text/javascript"></script>
+	<script src="js/midijs/gm.js" type="text/javascript"></script>
+	<script src="js/midijs/loader.js" type="text/javascript"></script>
+  <script src="js/midijs/player.js" type="text/javascript"></script>
+	<script src="js/midijs/plugin.audiotag.js" type="text/javascript"></script>
+	<script src="js/midijs/plugin.webaudio.js" type="text/javascript"></script>
+	<script src="js/midijs/plugin.webmidi.js" type="text/javascript"></script>
+
+  <!-- utils for midijs -->
+  <script src="./js/util/dom_request_xhr.js" type="text/javascript"></script>
+  <script src="./js/util/dom_request_script.js" type="text/javascript"></script>
+
+	<!-- jasmid package -->
+	<script src="js/inc/jasmid/stream.js"></script>
+	<script src="js/inc/jasmid/midifile.js"></script>
+	<script src="js/inc/jasmid/replayer.js"></script>
+
+  <!-- artcolor -->
+  <script src="js/colordata.js"></script>
+  <script src="js/photograph-midi.js"></script>
+
   <script>
-    const colors = [
-      // '#8c2d41',
-      '#d6b788',
-      '#a94312',
-      '#cb7b3c',
-      '#a8533f',
-      '#c29089',
-      '#9d876f',
-      '#b7a78e',
-      '#bd6f6d',
-      '#d1a092',
-      '#294668',
-      '#180e17',
-      '#3a223c',
-      '#160404',
-      '#d09585',
-      '#222744',
-      '#2d4d76',
-      '#20336b',
-      '#190f0e',
-      '#d8c1a1',
-      '#67a590',
-      '#231e32',
-      '#323858',
-      '#525b7a',
-      '#405e78',
-      '#252a48',
-      '#2d1e1b',
-      '#ba606c',
-      '#e2bcb1',
-      '#ca4f61',
-      '#ebb8a7',
-      '#4d375d',
-      '#824c5c',
-      '#5a2d34',
-      '#352319',
-      '#708363',
-      '#ded1b1',
-      '#66999a',
-      '#342b2e',
-      '#486f9a',
-      '#414f72',
-      '#38281b',
-      '#464158',
-      '#ebd6c5',
-      '#c2c8bc',
-      '#f0ccb4',
-      '#c6c6bc',
-      '#647668',
-      '#e6d6b4',
-      '#6a7a8a',
-      '#d9c7a3',
-      '#e7c69d',
-      '#e37d6e',
-      '#f4a563',
-      '#f1bf8a',
-      '#e5dec4',
-      '#adc8cf',
-      '#6c9279',
-      '#dab99a',
-      '#e6db7f',
-      '#e23e40',
-      '#ddd87a',
-      '#d5b994',
-      '#618c79',
-      '#aac7cf',
-      '#e8dbc8',
-      '#f6bf89',
-      '#e4733b',
-      '#eca861',
-      '#e27771',
-      '#f3c8a6',
-      '#d7caa8',
-      '#556f8a',
-      '#e8e5bc',
-      '#49746b',
-      '#cccecb',
-      '#efd4c3',
-      '#c2d3cd',
-      '#353e5d',
-      '#211b25',
-      '#324e7d',
-      '#3570ac',
-      '#23233b',
-      '#55a4ab',
-      '#dfd8c6',
-      '#61896e',
-      '#170d15',
-      '#501a3e',
-      '#2c2a5c',
-      '#f3c9bb',
-      '#cc4f71',
-      '#e1c4c0',
-      '#ac586f',
-      '#1c1624',
-      '#0f2860',
-      '#3a6e95',
-      '#54689a',
-      '#1c3c6d',
-      '#132845',
-      '#65b7ab',
-      '#e6d3b3',
-      '#242e52',
-      '#1b4788',
-      '#3165a1',
-      '#1f325c',
-      '#e2a89d',
-      '#0a0813',
-      '#362b56',
-      '#11172f',
-      '#315f9a',
-      '#deb6b6',
-      '#ca7e8a',
-      '#c9c0b1',
-      '#a69988',
-      '#c7a3a7',
-      '#b8665b',
-      '#d68b4a',
-      '#c36333',
-      '#e7cfad',
-      '#c7747c',
-      '#9c3b5e',
-      '#cc8267',
-      '#9d9a91',
-      '#ddc0c2',
-      '#913854',
-      '#225977',
-      '#051129',
-      '#3b836f',
-      '#067376',
-      '#78b47e',
-      '#091018',
-      '#b5cb8d',
-      '#34888a',
-      '#01365e',
-      '#020a0d',
-      '#245073',
-      '#31527b',
-      '#00040f',
-      '#081b3b',
-      '#063458',
-      '#2d1925',
-      '#b68e75',
-      '#2b617d',
-      '#154d6e',
-      '#3e87a8',
-      '#061220',
-      '#358a8f',
-      '#35857c',
-      '#334f74',
-      '#03000b',
-      '#041f62',
-      '#659db4',
-      '#2d4261',
-    ];
+    const arcWidth = 5;
+    const noteOffset = 36;  // min note for photograph
+    var currentTime = null;
+    var activeNoteIndicies = [];
 
     function getCanvas() {
       return document.getElementById('art-area');
@@ -206,7 +84,9 @@
       var canvas = getCanvas();
       var ox = canvas.width / 2;
       var oy = canvas.height / 2;
-      var w = 5;   // pixels wide per arc
+
+      var context = getCanvasContext();
+      context.clearRect(0, 0, canvas.width, canvas.height);
 
       const d360 = 2.0 * Math.PI;
       const d45 = d360 / 8.0;
@@ -219,19 +99,30 @@
         var c0 = colors[i];
         var c1 = colors[i+1];
 
-        // paint quadrants of the loop
-        const r = (2+i)* w;
+        // paint quadrants of the loop, reducing alpha on activeNoteIndicies
+        const r = (2+i)* arcWidth;
         for (var j=0; j<4; j++) {
           var cIn = (j%2 == 0) ? c0 : c1;
           var cOut = (j%2 == 0) ? c1 : c0;
-          drawArc(ox, oy, r, w, (2*j+1)*d45, (2*j+3)*d45, cIn, cOut);
-          drawArc(ox, oy, r+w, w, (2*j+1)*d45, (2*j+3)*d45, cOut, cIn);
+
+          // factor in activeNoteIndicies
+          if (activeNoteIndicies.includes(i)) {
+            if (j%2 == 0) {
+              cIn = cIn + '22';
+            } else {
+              cOut = cOut + '22';
+            }
+            // console.log('drawArt() ' + i + ' has cIn ' + cIn + ', cOut ' + cOut);
+          }
+
+          drawArc(ox, oy, r, arcWidth, (2*j+1)*d45, (2*j+3)*d45, cIn);
+          drawArc(ox, oy, r+arcWidth, arcWidth, (2*j+1)*d45, (2*j+3)*d45, cOut);
         }
       }
 
       // finish with innermost red circle
       var innerRedColor = '#bf1b1b';
-      drawCircle(ox, oy, 1*w, innerRedColor);
+      drawCircle(ox, oy, 1*arcWidth, innerRedColor);
     }
 
     function animateRing(index) {
@@ -244,42 +135,116 @@
       repaintRingColor(index, color);
     }
 
-    function repaintRingColor(i, color) {
+    function whiteOutRing(index) {
       var canvas = getCanvas();
       var ox = canvas.width / 2;
       var oy = canvas.height / 2;
-      var w = 5;   // pixels wide per arc
 
-      const d360 = 2.0 * Math.PI;
-      const d45 = d360 / 8.0;
-      if (i<0 || i>colors.length) {
-        console.log('repaintRingColor() with out-of-bounds ' + index);
-        return;
+      const r = (2+index)* arcWidth;
+      drawArc(ox, oy, r, arcWidth, 0, 2.0 * Math.PI, '#ffffff');
+    }
+
+    // var animateCounter = 0;
+    // function animateArtLoop() {
+    //   animateRing(animateCounter);
+    //   animateCounter += 1;
+    // }
+    //
+    // function animateArt() {
+    //   setInterval(animateArtLoop, 500);
+    // }
+
+    function onLoadPluginSucces() {
+      console.log('onLoadPluginSucces()');
+      MIDI.Player.loadFile(midiData, onMidiLoadSuccess); // load .MIDI from base64 or binary XML request.
+    }
+
+    function onMidiLoadSuccess() {
+      console.log('onMidiLoadSuccess()');
+      MIDI.Player.addListener(onMidiNotePlayed);
+    }
+
+    function initMidi() {
+      MIDI.soundfontUrl = './soundfont/';
+      MIDI.USE_XHR = false;
+
+      // // simple example to get started;
+      MIDI.loadPlugin({
+          instrument: "acoustic_grand_piano",
+          onsuccess: onLoadPluginSucces,
+      });
+
+      // MIDI.Player.currentTime = integer; // time we are at now within the song.
+      // MIDI.Player.endTime = integer; // time when song ends.
+      // MIDI.Player.playing = boolean; // are we playing? yes or no.
+      // MIDI.Player.loadFile('./photograph.mid', onMidiLoadSuccess); // load .MIDI from base64 or binary XML request.
+      // MIDI.Player.start(); // start the MIDI track (you can put this in the loadFile callback)
+      // MIDI.Player.resume(); // resume the MIDI track from pause.
+      // MIDI.Player.pause(); // pause the MIDI track.
+      // MIDI.Player.stop(); // stops all audio being played, and resets currentTime to 0.
+    }
+
+    var minNote = null;
+    var maxNote = null;
+
+    function indexFromNote(note) {
+      return (note - noteOffset) * 2;
+    }
+
+    var midiNotePlayedIndex = 0;
+    function onMidiNotePlayed(data) {
+      var now = data.now; // where we are now
+      var end = data.end; // time when song ends
+      var channel = data.channel; // channel note is playing on
+      var message = data.message; // 128 is noteOff, 144 is noteOn
+      var note = data.note; // the note
+      var velocity = data.velocity; // the velocity of the note
+
+      console.log('Note ' + note + ' at ' + now);
+
+      if (minNote == null || note < minNote) {
+        minNote = note;
+      }
+      if (maxNote == null || note > maxNote) {
+        maxNote = note;
       }
 
-      const r = (2+i)* w;
-      for (var j=0; j<4; j++) {
-        drawArc(ox, oy, r, w, (2*j+1)*d45, (2*j+3)*d45, color);
+      if (now != currentTime) {
+        // clear current notes, add this as new
+        activeNoteIndicies = [indexFromNote(note)];
+
+        // repaint
+        // if (midiNotePlayedIndex++ % 3 == 0)
+        drawArt();
+      } else {
+        // same timestamp, add this note as active
+        activeNoteIndicies.push(indexFromNote(note));
+
+        // repaint
+        // if (midiNotePlayedIndex++ % 3 == 0)
+        drawArt();
       }
     }
 
-    var animateCounter = 0;
-    function animateArtLoop() {
-      animateRing(animateCounter);
-      animateCounter += 1;
+    function onArtClick() {
+      if (MIDI.Player.playing) {
+        MIDI.Player.stop();
+      } else {
+        MIDI.Player.start();
+      }
     }
 
-    function animateArt() {
-      setInterval(animateArtLoop, 500);
+    function dumpMusicInfo() {
+      console.log('dumpMusicInfo() minNote ' + minNote + ', maxNote ' + maxNote);
     }
 
     // when the page is loaded, init
     document.addEventListener('DOMContentLoaded', (event) => {
       drawArt();
-      // animateArt();
+      initMidi();
     })
   </script>
 </head>
 <body>
-  <canvas id="art-area" width='700' height='700'></canvas></body>
+  <canvas id="art-area" width='700' height='700' onclick="onArtClick()"></canvas></body>
 </html>
