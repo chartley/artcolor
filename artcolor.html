@@ -112,7 +112,6 @@
             } else {
               cOut = cOut + '22';
             }
-            // console.log('drawArt() ' + i + ' has cIn ' + cIn + ', cOut ' + cOut);
           }
 
           drawArc(ox, oy, r, arcWidth, (2*j+1)*d45, (2*j+3)*d45, cIn);
@@ -143,16 +142,6 @@
       const r = (2+index)* arcWidth;
       drawArc(ox, oy, r, arcWidth, 0, 2.0 * Math.PI, '#ffffff');
     }
-
-    // var animateCounter = 0;
-    // function animateArtLoop() {
-    //   animateRing(animateCounter);
-    //   animateCounter += 1;
-    // }
-    //
-    // function animateArt() {
-    //   setInterval(animateArtLoop, 500);
-    // }
 
     function onLoadPluginSucces() {
       console.log('onLoadPluginSucces()');
@@ -191,7 +180,6 @@
       return (note - noteOffset) * 2;
     }
 
-    var midiNotePlayedIndex = 0;
     function onMidiNotePlayed(data) {
       var now = data.now; // where we are now
       var end = data.end; // time when song ends
@@ -200,7 +188,7 @@
       var note = data.note; // the note
       var velocity = data.velocity; // the velocity of the note
 
-      console.log('Note ' + note + ' at ' + now);
+      // console.log('Note ' + note + ' at ' + now);
 
       if (minNote == null || note < minNote) {
         minNote = note;
@@ -214,14 +202,12 @@
         activeNoteIndicies = [indexFromNote(note)];
 
         // repaint
-        // if (midiNotePlayedIndex++ % 3 == 0)
         drawArt();
       } else {
         // same timestamp, add this note as active
         activeNoteIndicies.push(indexFromNote(note));
 
         // repaint
-        // if (midiNotePlayedIndex++ % 3 == 0)
         drawArt();
       }
     }
