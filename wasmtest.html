@@ -17,14 +17,11 @@
             canvas: (function() { return document.getElementById('canvas'); })()
         };
 
-        // function initGlobal() {
-        //   const globalVar = new WebAssembly.Global({value:'i32', mutable:true}, 0);
-        // }
-
+        var notePlayed = 0;
         function flipBit() {
           set_note_played = Module.cwrap('set_note_played', 'number', ['number'])
-          set_note_played(1);
-          set_note_played(5);
+          notePlayed++;
+          set_note_played(notePlayed);
         }
 
         // when the page is loaded, init

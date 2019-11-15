@@ -8,6 +8,8 @@ struct context
     int iteration;
 };
 
+int note_played = NULL;
+
 void mainloop(void *arg)
 {
     context *ctx = static_cast<context*>(arg);
@@ -25,7 +27,12 @@ void mainloop(void *arg)
     r.y = 50;
     r.w = 50;
     r.h = 50;
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255 );
+    if (note_played % 2 == 0) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255 );
+    } else {
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255 );
+    }
+
     SDL_RenderFillRect(renderer, &r );
 
     SDL_RenderPresent(renderer);
@@ -35,6 +42,7 @@ void mainloop(void *arg)
 
 extern "C" {
   int set_note_played(int noteIndex) {
+    note_played = noteIndex;
     printf("set_note_played(%d)\n", noteIndex);
     return 0;
   }
