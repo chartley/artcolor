@@ -106,3 +106,7 @@ venv.bak/
 # Chris'
 working/
 .DS_Store
+
+# ignore emscripten targets
+js/wasmtest/index.js
+js/wasmtest/index.wasm
